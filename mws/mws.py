@@ -644,11 +644,16 @@ class InboundShipments(MWS):
         data.update(self.enumerate_param("SellerSKUList.Id.", sku_list))
         return self.make_request(extra_data=data)
 
-    def get_inbound_guidance_for_asin(self, asin_list):
-        if not isinstance(asin_list, tuple):
-            asin_list = tuple(asin_list)
+    def get_inbound_guidance_for_asin(self, asin_list, marketplaceid):
+        if isinstance(asin_list, str):
+            asin_list = (asin_list,)
+
+        if not isinstance(asin_list, collections.Iterable):
+            raise TypeError("Non-Iterable given to get_inbound_guidance_for_asin.")
+
         data = dict(Action='GetInboundGuidanceForASIN',
-                    SellerSKUList=asin_list)
+                    MarketplaceId=marketplaceid)
+        data.update(self.enumerate_param("ASINList.Id.", asin_list))
         return self.make_request(extra_data=data)
 
     def get_bill_of_lading(self, shipment_id):

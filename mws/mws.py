@@ -632,14 +632,15 @@ class InboundShipments(MWS):
     VERSION = '2010-10-01'
     URI = "/FulfillmentInboundShipment/2010-10-01"
 
-    def get_inbound_guidance_for_sku(self, sku_list):
+    def get_inbound_guidance_for_sku(self, sku_list, marketplaceid):
         if isinstance(sku_list, str):
             sku_list = (sku_list,)
         
         if not isinstance(sku_list, collections.Iterable):
             raise TypeError("Non-Iterable given to get_inbound_guidance_for_sku.")
 
-        data = dict(Action='GetInboundGuidanceForSKU')
+        data = dict(Action='GetInboundGuidanceForSKU',
+                    MarketplaceId=marketplaceid)
         data.update(self.enumerate_param("SellerSKUList.Id.", sku_list))
         return self.make_request(extra_data=data)
 

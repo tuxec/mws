@@ -11,6 +11,8 @@ import datetime
 from requests import request
 from requests.exceptions import HTTPError
 
+import collections
+
 from . import utils
 
 try:
@@ -631,10 +633,14 @@ class InboundShipments(MWS):
     URI = "/FulfillmentInboundShipment/2010-10-01"
 
     def get_inbound_guidance_for_sku(self, sku_list):
-        if not isinstance(sku_list, tuple):
-            sku_list = tuple(sku_list)
-        data = dict(Action='GetInboundGuidanceForSKU',
-                    SellerSKUList=sku_list)
+        if isinstance(sku_list, str):
+            sku_list = (sku_list,)
+        
+        if not isinstance(sku_list, collections.Iterable):
+            raise TypeError("Non-Iterable given to get_inbound_guidance_for_sku.")
+
+        data = dict(Action='GetInboundGuidanceForSKU')
+        data.update(self.enumerate_param("SellerSKUList.Id.", sku_list))
         return self.make_request(extra_data=data)
 
     def get_inbound_guidance_for_asin(self, asin_list):
